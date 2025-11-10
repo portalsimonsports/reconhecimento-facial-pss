@@ -1,158 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reconhecimento Facial</title>
+<section class="card">
+  <h2>Cadastro</h2>
 
-<!-- face-api.js -->
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <label for="nome">Nome completo</label>
+  <input type="text" id="nome" placeholder="Nome completo" />
 
-<style>
-  :root{
-    --bg:#0b1220;--card:#0f172a;--ink:#e5e7eb;--muted:#94a3b8;--accent:#2563eb;
-    --ok:#10b981;--err:#f43f5e;--line:#1f2a44;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.55 system-ui,Segoe UI,Roboto,sans-serif}
-  .wrap{max-width:1120px;margin:24px auto;padding:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
-        box-shadow:0 12px 30px rgba(0,0,0,.35);padding:16px}
-  h1{margin:0 0 8px;font-size:22px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-  h2{margin:0 0 8px;font-size:18px}
-  #clock{font-size:15px;color:var(--muted)}
-  .muted{color:var(--muted);font-size:13px;margin-bottom:16px}
-  .row{display:flex;gap:16px;flex-wrap:wrap}
-  .col{flex:1;min-width:320px}
-  label{display:block;margin:10px 0 6px;font-size:13px;color:#cbd5e1}
-  input,select{width:100%;padding:10px;border:1px solid #334155;border-radius:10px;
-               background:#0b1220;color:#e5e7eb}
-  .btn{padding:10px 14px;border:0;border-radius:12px;background:var(--accent);
-       color:#fff;font-weight:700;cursor:pointer}
-  .btn.alt{background:#0ea5e9}
-  .btn.ghost{background:#111827;border:1px solid #293247;color:#d1d5db}
-  .btn:disabled{opacity:.6;cursor:not-allowed}
-  video,canvas{width:100%;border-radius:14px;background:#0b1120;min-height:240px}
-  .status{margin-top:10px;font-size:14px}
-  .ok{color:var(--ok)} .err{color:var(--err)}
-  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;
-        background:#111827;border:1px solid #1f2937;font-size:12px}
-  .stack{display:flex;gap:8px;flex-wrap:wrap}
-  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .slider{accent-color:var(--accent);width:100%}
-  .box{background:#0b1120;border:1px solid var(--line);border-radius:10px;padding:10px}
-  .log{white-space:pre-wrap;font-size:12px;max-height:180px;overflow:auto}
-  hr{border-color:#1f2a44;margin:18px 0}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
-         background:#0b1120;border:1px solid #1f2a44;color:#e5e7eb;
-         padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);
-         opacity:0;pointer-events:none;transition:.25s}
-  .toast.show{opacity:1;pointer-events:auto}
-  .toast.ok{border-color:#0f5132;color:#d1fae5}
-  .toast.err{border-color:#7f1d1d;color:#ffe4e6}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="card">
-    <h1>
-      <span>Reconhecimento Facial</span>
-      <span id="clock">--:--:--</span>
-    </h1>
-    <div class="muted">Front no GitHub Pages + API no Apps Script (Planilhas + Drive). Clique <b>Ativar câmera</b>.</div>
+  <label for="tipoDoc">Tipo de Documento</label>
+  <select id="tipoDoc">
+    <option value="">Selecione</option>
+    <option value="rg">RG</option>
+    <option value="cpf">CPF</option>
+    <option value="cin">CIN</option>
+  </select>
 
-    <div class="row">
-      <div class="col">
-        <h2>Cadastro</h2>
-        <label>Nome completo</label>
-        <input id="nome" placeholder="Nome completo" />
-        <div class="row">
-          <div class="col">
-            <label>RG</label>
-            <input id="rg" placeholder="RG" />
-          </div>
-          <div class="col">
-            <label>CPF</label>
-            <input id="cpf" placeholder="CPF" />
-          </div>
-        </div>
-        <label>CIN</label>
-        <input id="cin" placeholder="CIN" />
-        <div class="toolbar" style="margin-top:12px">
-          <button id="btnStart" class="btn alt">Ativar câmera</button>
-          <button id="btnStop" class="btn ghost" disabled>Parar</button>
-          <button id="btnRear" class="btn ghost" title="Usar câmera traseira (celular)">Câmera traseira</button>
-          <button id="btnShot" class="btn" disabled>Capturar foto + salvar</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <div class="col">
-            <label>Dispositivo de vídeo</label>
-            <select id="deviceSelect"></select>
-          </div>
-          <div class="col">
-            <label>Sensibilidade</label>
-            <input id="thresh" class="slider" type="range" min="0.40" max="0.80" step="0.01" value="0.58" />
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted)">
-              <span>Mais sensível</span><b id="threshVal">0.58</b><span>Mais restrito</span>
-            </div>
-          </div>
-        </div>
-        <div class="status" id="cadStatus"></div>
-      </div>
-
-      <div class="col">
-        <h2>Câmera</h2>
-        <video id="video" playsinline muted></video>
-        <canvas id="canvas" style="display:none"></canvas>
-        <div class="status stack">
-          <span class="pill" id="modelStatus">Carregando modelos…</span>
-          <span class="pill">Matches: <b id="matchCount">0</b></span>
-          <span class="pill">Sim.: <b id="liveScore">—</b></span>
-        </div>
-      </div>
-    </div>
-
-    <hr />
-    <div class="row">
-      <div class="col">
-        <h2>Reconhecimento (ao vivo)</h2>
-        <div class="muted">Deixe a tela aberta; quando identificar, mostra o nome.</div>
-        <div class="box" id="matchBox">Aguardando ativação da câmera…</div>
-      </div>
-      <div class="col">
-        <h2>Logs</h2>
-        <div class="box log" id="log"></div>
-      </div>
-    </div>
+  <div id="campoRG" class="campo-doc oculto">
+    <label for="rg">RG</label>
+    <input type="text" id="rg" placeholder="RG" />
   </div>
-</div>
 
-<div id="toast" class="toast"></div>
+  <div id="campoCPF" class="campo-doc oculto">
+    <label for="cpf">CPF</label>
+    <input type="text" id="cpf" placeholder="CPF" />
+  </div>
+
+  <div id="campoCIN" class="campo-doc oculto">
+    <label for="cin">CIN</label>
+    <input type="text" id="cin" placeholder="CIN" />
+  </div>
+
+  <button id="btnAtivar">Ativar câmera</button>
+  <button id="btnParar" disabled>Parar</button>
+  <button id="btnCameraT">Câmera traseira</button>
+  <button id="btnCapturar">Capturar foto + salvar</button>
+
+  <label for="videoDevice">Dispositivo de vídeo</label>
+  <select id="videoDevice"></select>
+</section>
 
 <script>
-/* ====== RELÓGIO EM TEMPO REAL ====== */
-function atualizarRelogio() {
-  const clock = document.getElementById("clock");
-  const agora = new Date();
-  const dia = String(agora.getDate()).padStart(2, "0");
-  const mes = String(agora.getMonth() + 1).padStart(2, "0");
-  const ano = agora.getFullYear();
-  const hora = String(agora.getHours()).padStart(2, "0");
-  const min = String(agora.getMinutes()).padStart(2, "0");
-  const seg = String(agora.getSeconds()).padStart(2, "0");
-  clock.textContent = `${dia}/${mes}/${ano} — ${hora}:${min}:${seg}`;
-}
-setInterval(atualizarRelogio, 1000);
-atualizarRelogio();
+document.addEventListener("DOMContentLoaded", () => {
+  const selectTipo = document.getElementById("tipoDoc");
+  const campos = {
+    rg: document.getElementById("campoRG"),
+    cpf: document.getElementById("campoCPF"),
+    cin: document.getElementById("campoCIN"),
+  };
 
-/* ====== API URL ====== */
-const GAS_API_URL='https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
-
-/* ====== FUNÇÕES FACE E RECONHECIMENTO ======
-   copie exatamente o JS da sua versão anterior daqui pra baixo
-   (mantém todas as funções: loadModels, startCamera, snapshot, saveCadastro, etc.)
-   nada precisa ser alterado no restante do script.
-*/
+  // Oculta/mostra conforme seleção
+  selectTipo.addEventListener("change", () => {
+    Object.values(campos).forEach(c => c.classList.add("oculto"));
+    const tipo = selectTipo.value;
+    if (campos[tipo]) campos[tipo].classList.remove("oculto");
+  });
+});
 </script>
-</body>
-</html>
+
+<style>
+.card {
+  background: #0f172a;
+  color: #fff;
+  padding: 1.5em;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  margin: 1em;
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+button {
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+button:disabled {
+  background: #475569;
+  cursor: not-allowed;
+}
+
+.oculto {
+  display: none;
+}
+</style>
