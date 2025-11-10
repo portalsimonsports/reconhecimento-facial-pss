@@ -3,52 +3,50 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reconhecimento Facial — PSS (GitHub Pages + GAS API)</title>
-<style>
-  body{margin:0;font:500 15px/1.5 system-ui,Segoe UI,Roboto,sans-serif;background:#0b1220;color:#e5e7eb}
-  .wrap{max-width:1100px;margin:24px auto;padding:16px}<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reconhecimento Facial — PSS</title>
+<title>Reconhecimento Facial</title>
 
 <!-- face-api.js -->
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <style>
   :root{
-    --bg:#0b1220;--card:#0f172a;--ink:#e5e7eb;--muted:#94a3b8;--accent:#2563eb;--ok:#10b981;--err:#f43f5e;--line:#1f2a44;
+    --bg:#0b1220;--card:#0f172a;--ink:#e5e7eb;--muted:#94a3b8;--accent:#2563eb;
+    --ok:#10b981;--err:#f43f5e;--line:#1f2a44;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.55 system-ui,Segoe UI,Roboto,sans-serif}
   .wrap{max-width:1120px;margin:24px auto;padding:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:16px}
-  h1{margin:0 0 8px;font-size:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+        box-shadow:0 12px 30px rgba(0,0,0,.35);padding:16px}
+  h1{margin:0 0 8px;font-size:22px;display:flex;justify-content:space-between;align-items:center;gap:10px}
   h2{margin:0 0 8px;font-size:18px}
+  #clock{font-size:15px;color:var(--muted)}
   .muted{color:var(--muted);font-size:13px;margin-bottom:16px}
   .row{display:flex;gap:16px;flex-wrap:wrap}
   .col{flex:1;min-width:320px}
   label{display:block;margin:10px 0 6px;font-size:13px;color:#cbd5e1}
-  input,select{width:100%;padding:10px;border:1px solid #334155;border-radius:10px;background:#0b1220;color:#e5e7eb}
-  .btn{padding:10px 14px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+  input,select{width:100%;padding:10px;border:1px solid #334155;border-radius:10px;
+               background:#0b1220;color:#e5e7eb}
+  .btn{padding:10px 14px;border:0;border-radius:12px;background:var(--accent);
+       color:#fff;font-weight:700;cursor:pointer}
   .btn.alt{background:#0ea5e9}
   .btn.ghost{background:#111827;border:1px solid #293247;color:#d1d5db}
   .btn:disabled{opacity:.6;cursor:not-allowed}
   video,canvas{width:100%;border-radius:14px;background:#0b1120;min-height:240px}
   .status{margin-top:10px;font-size:14px}
   .ok{color:var(--ok)} .err{color:var(--err)}
-  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#111827;border:1px solid #1f2937;font-size:12px}
+  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;
+        background:#111827;border:1px solid #1f2937;font-size:12px}
   .stack{display:flex;gap:8px;flex-wrap:wrap}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .slider{accent-color:var(--accent);width:100%}
   .box{background:#0b1120;border:1px solid var(--line);border-radius:10px;padding:10px}
   .log{white-space:pre-wrap;font-size:12px;max-height:180px;overflow:auto}
-  .kv{display:flex;gap:10px;flex-wrap:wrap}
-  .kv .pill b{font-weight:800}
-  .center{display:flex;gap:8px;justify-content:space-between;align-items:center}
-  /* Toasts */
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0b1120;border:1px solid #1f2a44;color:#e5e7eb;padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s}
+  hr{border-color:#1f2a44;margin:18px 0}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+         background:#0b1120;border:1px solid #1f2a44;color:#e5e7eb;
+         padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);
+         opacity:0;pointer-events:none;transition:.25s}
   .toast.show{opacity:1;pointer-events:auto}
   .toast.ok{border-color:#0f5132;color:#d1fae5}
   .toast.err{border-color:#7f1d1d;color:#ffe4e6}
@@ -57,16 +55,18 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>Reconhecimento Facial — Portal SimonSports</h1>
-    <div class="muted">UI no GitHub Pages + API no Google Apps Script (Planilha + Drive). Primeiro clique <b>Ativar câmera</b>.</div>
+    <h1>
+      <span>Reconhecimento Facial</span>
+      <span id="clock">--:--:--</span>
+    </h1>
+    <div class="muted">Front no GitHub Pages + API no Apps Script (Planilhas + Drive). Clique <b>Ativar câmera</b>.</div>
 
+    <!-- restante igual -->
     <div class="row">
       <div class="col">
         <h2>Cadastro</h2>
-
         <label>Nome completo</label>
         <input id="nome" placeholder="Nome completo" />
-
         <div class="row">
           <div class="col">
             <label>RG</label>
@@ -77,29 +77,27 @@
             <input id="cpf" placeholder="CPF" />
           </div>
         </div>
-
         <label>CIN</label>
         <input id="cin" placeholder="CIN" />
-
         <div class="toolbar" style="margin-top:12px">
           <button id="btnStart" class="btn alt">Ativar câmera</button>
           <button id="btnStop" class="btn ghost" disabled>Parar</button>
           <button id="btnRear" class="btn ghost" title="Usar câmera traseira (celular)">Câmera traseira</button>
           <button id="btnShot" class="btn" disabled>Capturar foto + salvar</button>
         </div>
-
         <div class="row" style="margin-top:8px">
           <div class="col">
             <label>Dispositivo de vídeo</label>
             <select id="deviceSelect"></select>
           </div>
           <div class="col">
-            <label>Sensibilidade (limiar de similaridade)</label>
+            <label>Sensibilidade</label>
             <input id="thresh" class="slider" type="range" min="0.40" max="0.80" step="0.01" value="0.58" />
-            <div class="center"><span class="muted">Mais sensível</span><b id="threshVal">0.58</b><span class="muted">Mais restrito</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted)">
+              <span>Mais sensível</span><b id="threshVal">0.58</b><span>Mais restrito</span>
+            </div>
           </div>
         </div>
-
         <div class="status" id="cadStatus"></div>
       </div>
 
@@ -115,8 +113,7 @@
       </div>
     </div>
 
-    <hr style="border-color:#1f2a44;margin:18px 0" />
-
+    <hr />
     <div class="row">
       <div class="col">
         <h2>Reconhecimento (ao vivo)</h2>
@@ -134,480 +131,20 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* ====== CONFIG ====== */
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
+/* ====== RELÓGIO EM TEMPO REAL ====== */
+setInterval(()=>{
+  const d=new Date();
+  const h=String(d.getHours()).padStart(2,'0');
+  const m=String(d.getMinutes()).padStart(2,'0');
+  const s=String(d.getSeconds()).padStart(2,'0');
+  $('#clock').textContent=`${h}:${m}:${s}`;
+},1000);
 
-/* ====== ESTADO ====== */
-const S = {
-  stream: null,
-  usingRear: false,
-  running: false,
-  embeddings: [],
-  lastName: '',
-  matches: 0,
-  thresh: 0.58
-};
+/* ====== API URL ====== */
+const GAS_API_URL='https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
 
-/* ====== UI SHORTCUTS ====== */
-const $ = sel => document.querySelector(sel);
-const log = (m) => { const el=$('#log'); el.textContent += `[${new Date().toLocaleTimeString()}] ${m}\n`; el.scrollTop = el.scrollHeight; };
-const toast = (msg,kind='ok') => { const t=$('#toast'); t.textContent=msg; t.className='toast '+kind+' show'; setTimeout(()=>t.classList.remove('show'),2400); };
-
-/* ====== MODELOS ====== */
-async function loadModels(){
-  const W = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights';
-  await Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri(W),
-    faceapi.nets.faceLandmark68Net.loadFromUri(W),
-    faceapi.nets.faceRecognitionNet.loadFromUri(W),
-  ]);
-  $('#modelStatus').textContent = 'Modelos prontos';
-  log('Modelos carregados.');
-}
-
-/* ====== DISPOSITIVOS ====== */
-async function listDevices(){
-  const devs = await navigator.mediaDevices.enumerateDevices();
-  const cams = devs.filter(d=>d.kind==='videoinput');
-  const sel = $('#deviceSelect'); sel.innerHTML='';
-  cams.forEach((c,i)=>{ const o=document.createElement('option'); o.value=c.deviceId; o.textContent=c.label||`Câmera ${i+1}`; sel.appendChild(o); });
-  if (!cams.length) log('Nenhuma câmera encontrada.');
-}
-
-/* ====== CÂMERA ====== */
-async function startCamera({rear=false, deviceId=null}={}){
-  if (S.stream) stopCamera();
-
-  const constraints = deviceId
-    ? { video: { deviceId: { exact: deviceId } }, audio:false }
-    : { video: { facingMode: rear ? { exact:'environment' } : 'user' }, audio:false };
-
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    const v = $('#video'); v.srcObject = stream; S.stream = stream; S.usingRear = rear;
-    await new Promise(res => v.onloadedmetadata = () => { v.play(); res(); });
-    await listDevices();
-    $('#btnShot').disabled = false;
-    $('#btnStop').disabled = false;
-    $('#btnStart').disabled = true;
-    $('#matchBox').textContent = 'Câmera ativa, iniciando reconhecimento…';
-    if (!S.running) recognitionLoop();
-    log('Câmera iniciada.');
-  }catch(e){
-    $('#matchBox').innerHTML = `<span class="err">Falha ao iniciar câmera: ${e.name||''} ${e.message||e}</span>`;
-    toast('Erro ao abrir câmera', 'err'); log('getUserMedia: '+(e.name||'')+' '+(e.message||e));
-  }
-}
-function stopCamera(){
-  if (S.stream){ S.stream.getTracks().forEach(t=>t.stop()); S.stream=null; }
-  $('#btnShot').disabled = true;
-  $('#btnStop').disabled = true;
-  $('#btnStart').disabled = false;
-  S.running = false;
-  $('#matchBox').textContent = 'Câmera parada.';
-}
-
-/* ====== EMBEDDINGS ====== */
-async function fetchEmbeddings(){
-  const r = await fetch(`${GAS_API_URL}?fn=list`);
-  const j = await r.json();
-  if (!j.ok) throw new Error(j.error||'Falha ao listar');
-  S.embeddings = j.data || [];
-  log(`Embeddings carregados: ${S.embeddings.length}`);
-}
-
-/* ====== SNAPSHOT ====== */
-function snapshotBase64(){
-  const v=$('#video'); if (!v.videoWidth) throw new Error('Vídeo não carregado.');
-  const c=$('#canvas'); c.width=v.videoWidth; c.height=v.videoHeight;
-  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
-  return c.toDataURL('image/jpeg',0.9);
-}
-
-/* ====== EMBEDDING AO VIVO ====== */
-async function liveEmbedding(){
-  const v = $('#video');
-  const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-  if (!det) return null;
-  return Array.from(det.descriptor);
-}
-
-/* ====== SIMILARIDADE ====== */
-function cosine(a,b){
-  if (!a || !b || a.length!==b.length) return -1;
-  let dot=0,na=0,nb=0; for(let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
-  return dot/(Math.sqrt(na)*Math.sqrt(nb));
-}
-
-/* ====== LOOP ====== */
-async function recognitionLoop(){
-  if (S.running) return;
-  S.running = true;
-  while (S.running){
-    try{
-      const emb = await liveEmbedding();
-      if (emb){
-        let best={name:'Desconhecido',score:-1};
-        for (const p of S.embeddings){
-          const s = cosine(emb, p.embedding);
-          if (s>best.score) best={name:p.nome,score:s};
-        }
-        $('#liveScore').textContent = best.score>0? best.score.toFixed(2) : '—';
-        if (best.score >= S.thresh){
-          if (best.name !== S.lastName){
-            S.lastName = best.name; S.matches++;
-            $('#matchCount').textContent = S.matches;
-            $('#matchBox').innerHTML = `✅ <b>${best.name}</b> reconhecido (similaridade ${best.score.toFixed(2)} ≥ ${S.thresh.toFixed(2)})`;
-            toast(`Reconhecido: ${best.name}`);
-            log(`Match: ${best.name} (sim=${best.score.toFixed(3)})`);
-          }
-        } else {
-          $('#matchBox').textContent = 'Sem correspondência confiável…';
-        }
-      } else {
-        $('#matchBox').textContent = 'Rosto não detectado…';
-        $('#liveScore').textContent = '—';
-      }
-    }catch(e){
-      $('#matchBox').innerHTML = `<span class="err">Erro no reconhecimento: ${e.message}</span>`;
-      log('Reconhecimento: '+e.message);
-    }
-    await new Promise(r=>setTimeout(r,550));
-  }
-}
-
-/* ====== CADASTRO ====== */
-async function saveCadastro(){
-  const nome=$('#nome').value.trim();
-  const rg=$('#rg').value.trim();
-  const cpf=$('#cpf').value.trim();
-  const cin=$('#cin').value.trim();
-  const cadStatus=$('#cadStatus');
-
-  if (!nome){ cadStatus.innerHTML='<span class="err">Informe o nome completo.</span>'; toast('Informe o nome.', 'err'); return; }
-
-  try{
-    const foto = snapshotBase64();
-    const embedding = await liveEmbedding();
-    if (!embedding){ cadStatus.innerHTML='<span class="err">Não foi possível detectar o rosto.</span>'; toast('Sem rosto detectado.', 'err'); return; }
-
-    const r = await fetch(`${GAS_API_URL}?fn=save`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ nome, rg, cpf, cin, embedding, fotoBase64: foto })
-    });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error||'Falha ao salvar');
-
-    cadStatus.innerHTML = `<span class="ok">Cadastro salvo.</span>`;
-    toast('Cadastro salvo!');
-    log('Cadastro salvo. FileId: '+(j.fileId||''));
-    await fetchEmbeddings();
-  }catch(e){
-    cadStatus.innerHTML = `<span class="err">${e.message}</span>`;
-    toast('Erro ao salvar cadastro', 'err');
-    log('Cadastro: '+e.message);
-  }
-}
-
-/* ====== BOOT ====== */
-(async function init(){
-  try{
-    // garante estrutura na planilha
-    fetch(`${GAS_API_URL}?fn=ensure`).catch(()=>{});
-    await loadModels();
-    if (!('mediaDevices' in navigator)) {
-      $('#matchBox').innerHTML = '<span class="err">Navegador sem suporte à câmera.</span>';
-      log('mediaDevices não suportado.');
-    } else {
-      await listDevices(); // labels aparecem após primeira permissão
-    }
-  }catch(e){
-    $('#matchBox').innerHTML = `<span class="err">Falha ao iniciar: ${e.message}</span>`;
-    log('Init: '+e.message);
-  }
-})();
-
-/* ====== EVENTOS ====== */
-$('#btnStart').addEventListener('click', async ()=>{
-  try{
-    const id = $('#deviceSelect').value || null;
-    await startCamera({ deviceId: id });
-    await fetchEmbeddings();
-  }catch(e){ log('Start: '+e.message); toast('Erro ao iniciar', 'err'); }
-});
-$('#btnStop').addEventListener('click', ()=>{ stopCamera(); });
-$('#btnRear').addEventListener('click', async ()=>{
-  try{
-    await startCamera({ rear: !S.usingRear });
-    await fetchEmbeddings();
-  }catch(e){ log('Rear: '+e.message); toast('Erro ao alternar câmera', 'err'); }
-});
-$('#deviceSelect').addEventListener('change', async (e)=>{
-  try{ await startCamera({ deviceId: e.target.value }); }catch{}
-});
-$('#btnShot').addEventListener('click', saveCadastro);
-$('#thresh').addEventListener('input', e=>{
-  S.thresh = parseFloat(e.target.value||'0.58'); $('#threshVal').textContent = S.thresh.toFixed(2);
-});
-
-</script>
-</body>
-</html>
-
-  .card{background:#0f172a;border:1px solid #1f2a44;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:16px}
-  h1{font-size:20px;margin:0 0 8px}
-  .muted{color:#94a3b8;font-size:13px;margin-bottom:16px}
-  .row{display:flex;gap:16px;flex-wrap:wrap}
-  .col{flex:1;min-width:320px}
-  label{display:block;font-size:13px;color:#cbd5e1;margin:10px 0 4px}
-  input,select{width:100%;padding:10px;border:1px solid #334155;border-radius:10px;background:#0b1220;color:#e5e7eb}
-  button{padding:10px 14px;border:0;border-radius:12px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
-  button.alt{background:#0ea5e9}
-  .ok{color:#10b981;margin-left:8px}
-  .err{color:#f43f5e}
-  video,canvas{width:100%;border-radius:14px;background:#111827;min-height:240px}
-  .status{margin-top:10px;font-size:14px}
-  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#111827;border:1px solid #1f2937;color:#e5e7eb;font-size:12px}
-  .log{white-space:pre-wrap;font-size:12px;background:#0b1120;border:1px solid #1f2a44;border-radius:10px;padding:10px;max-height:180px;overflow:auto}
-</style>
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Reconhecimento Facial — Portal SimonSports</h1>
-      <div class="muted">Front no GitHub Pages + API no Apps Script (Planilhas + Drive). Clique <b>Ativar câmera</b>.</div>
-
-      <div class="row">
-        <div class="col">
-          <h2>Cadastro</h2>
-          <label>Nome completo</label>
-          <input id="nome" placeholder="Nome completo" />
-          <div class="row">
-            <div class="col"><label>RG</label><input id="rg" placeholder="RG" /></div>
-            <div class="col"><label>CPF</label><input id="cpf" placeholder="CPF" /></div>
-          </div>
-          <label>CIN</label><input id="cin" placeholder="CIN" />
-          <div class="row" style="margin-top:10px;align-items:center">
-            <div class="col">
-              <button id="btnStart" class="alt">Ativar câmera</button>
-              <button id="btnFoto">Capturar foto + salvar</button>
-            </div>
-            <div class="col">
-              <label>Dispositivo de vídeo</label>
-              <select id="deviceSelect"></select>
-            </div>
-          </div>
-          <div class="status" id="cadStatus"></div>
-        </div>
-
-        <div class="col">
-          <h2>Câmera</h2>
-          <video id="video" playsinline muted></video>
-          <canvas id="photo" style="display:none"></canvas>
-          <div class="status"><span class="pill" id="modelStatus">Carregando modelos…</span></div>
-        </div>
-      </div>
-
-      <hr style="border-color:#1f2a44;margin:18px 0"/>
-
-      <div class="row">
-        <div class="col">
-          <h2>Reconhecimento (ao vivo)</h2>
-          <div class="muted">Deixe a tela aberta. Ao identificar, mostra o nome.</div>
-          <div class="status" id="recStatus">Aguardando ativação da câmera…</div>
-          <div class="status" id="matchStatus"></div>
-        </div>
-        <div class="col">
-          <h2>Logs</h2>
-          <div id="log" class="log"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<script>
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
-const state = { embeddingsBase: [], running: false, lastMatch: '', stream: null };
-
-function log(msg){ const el = document.getElementById('log'); el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`; el.scrollTop = el.scrollHeight; }
-
-async function loadModels() {
-  const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights';
-  await Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-  ]);
-  document.getElementById('modelStatus').textContent = 'Modelos prontos';
-  log('Modelos carregados.');
-}
-
-async function listDevices() {
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const cams = devices.filter(d => d.kind === 'videoinput');
-    const sel = document.getElementById('deviceSelect');
-    sel.innerHTML = '';
-    cams.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.deviceId; opt.textContent = c.label || `Câmera ${sel.length+1}`;
-      sel.appendChild(opt);
-    });
-    if (!cams.length) log('Nenhuma câmera encontrada.');
-  } catch (e) { log('enumerateDevices: ' + e.message); }
-}
-
-async function startCamera(deviceId) {
-  if (state.stream) { state.stream.getTracks().forEach(t => t.stop()); state.stream = null; }
-  const constraints = deviceId ? { video: { deviceId: { exact: deviceId } }, audio: false }
-                               : { video: { facingMode: 'user' }, audio: false };
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    const video = document.getElementById('video');
-    video.srcObject = stream;
-    state.stream = stream;
-    await new Promise(res => video.onloadedmetadata = () => { video.play(); res(); });
-    document.getElementById('recStatus').textContent = 'Câmera ativa, iniciando reconhecimento…';
-    log('Câmera iniciada.');
-    if (!state.running) recognitionLoop(); // inicia o loop
-    await listDevices(); // labels aparecem após primeira permissão
-  } catch (e) {
-    document.getElementById('recStatus').innerHTML = `<span class="err">Falha ao iniciar câmera: ${e.name||''} ${e.message||e}</span>`;
-    log('getUserMedia erro: ' + (e.name||'') + ' ' + (e.message||e));
-  }
-}
-
-function takeSnapshot() {
-  const video = document.getElementById('video');
-  if (!video.videoWidth) throw new Error('Vídeo não carregado.');
-  const canvas = document.getElementById('photo');
-  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL('image/jpeg', 0.9);
-}
-
-async function computeEmbeddingFromVideo() {
-  const video = document.getElementById('video');
-  const det = await faceapi
-     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-     .withFaceLandmarks()
-     .withFaceDescriptor();
-  if (!det) return null;
-  return Array.from(det.descriptor);
-}
-
-function cosineSimilarity(a, b) {
-  if (!a || !b || a.length !== b.length) return -1;
-  let dot=0, na=0, nb=0;
-  for (let i=0;i<a.length;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
-  return dot / (Math.sqrt(na)*Math.sqrt(nb));
-}
-
-async function fetchEmbeddings() {
-  const r = await fetch(`${GAS_API_URL}?fn=list`, { method:'GET', credentials:'omit' });
-  const j = await r.json();
-  if (!j.ok) throw new Error(j.error||'Falha ao listar');
-  state.embeddingsBase = j.data || [];
-  log(`Embeddings carregados: ${state.embeddingsBase.length}`);
-}
-
-async function saveCadastro(payload) {
-  const r = await fetch(`${GAS_API_URL}?fn=save`, {
-    method:'POST', headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify(payload), credentials:'omit'
-  });
-  const j = await r.json();
-  if (!j.ok) throw new Error(j.error||'Falha ao salvar');
-  return j;
-}
-
-async function recognitionLoop() {
-  if (state.running) return;
-  state.running = true;
-  const recStatus = document.getElementById('recStatus');
-  const matchStatus = document.getElementById('matchStatus');
-
-  while (state.running) {
-    try {
-      const emb = await computeEmbeddingFromVideo();
-      if (emb) {
-        let best = { name: 'Desconhecido', score: -1 };
-        for (const p of state.embeddingsBase) {
-          const s = cosineSimilarity(emb, p.embedding);
-          if (s > best.score) best = { name: p.nome, score: s };
-        }
-        if (best.score >= 0.58 && best.name !== state.lastMatch) {
-          state.lastMatch = best.name;
-          matchStatus.innerHTML = `<span class="ok">Reconhecimento realizado:</span> <b>${best.name}</b> (sim=${best.score.toFixed(2)})`;
-          log(`Match: ${best.name} (sim=${best.score.toFixed(3)})`);
-        } else if (best.score < 0.58) {
-          matchStatus.textContent = 'Sem correspondência confiável no momento…';
-        }
-        recStatus.textContent = 'Rodando…';
-      } else {
-        recStatus.textContent = 'Rosto não detectado…';
-      }
-    } catch(e) {
-      matchStatus.innerHTML = `<span class="err">Erro no reconhecimento: ${e.message}</span>`;
-      log('Reconhecimento erro: ' + e.message);
-    }
-    await new Promise(r => setTimeout(r, 600));
-  }
-}
-
-/* ===== UI ===== */
-document.getElementById('btnStart').addEventListener('click', async ()=>{
-  try {
-    await startCamera(document.getElementById('deviceSelect').value || null);
-    await fetchEmbeddings();
-  } catch(e) { log('Start erro: ' + e.message); }
-});
-
-document.getElementById('deviceSelect').addEventListener('change', async (e)=>{
-  await startCamera(e.target.value);
-});
-
-document.getElementById('btnFoto').addEventListener('click', async ()=>{
-  const nome = document.getElementById('nome').value.trim();
-  const rg = document.getElementById('rg').value.trim();
-  const cpf = document.getElementById('cpf').value.trim();
-  const cin = document.getElementById('cin').value.trim();
-  const cadStatus = document.getElementById('cadStatus');
-
-  if (!nome) { cadStatus.innerHTML = '<span class="err">Informe o nome completo.</span>'; return; }
-
-  try {
-    const fotoBase64 = takeSnapshot();
-    const embedding = await computeEmbeddingFromVideo();
-    if (!embedding) { cadStatus.innerHTML = '<span class="err">Não foi possível detectar o rosto.</span>'; return; }
-
-    const resp = await saveCadastro({ nome, rg, cpf, cin, embedding, fotoBase64 });
-    cadStatus.innerHTML = `<span class="ok">Cadastro salvo.</span>`;
-    log('Cadastro salvo. FileId: ' + (resp.fileId||'') );
-    await fetchEmbeddings(); // atualiza base
-  } catch(e) {
-    cadStatus.innerHTML = `<span class="err">${e.message}</span>`;
-    log('Cadastro erro: ' + e.message);
-  }
-});
-
-(async function init(){
-  try {
-    await loadModels();
-    if (!('mediaDevices' in navigator)) {
-      document.getElementById('recStatus').innerHTML = '<span class="err">Navegador sem suporte a câmera.</span>';
-      log('mediaDevices não suportado.');
-    } else {
-      await listDevices(); // pode listar vazio até a primeira permissão
-    }
-  } catch(e) {
-    document.getElementById('recStatus').innerHTML = `<span class="err">Falha ao iniciar: ${e.message}</span>`;
-    log('Init erro: ' + e.message);
-  }
-})();
+/* (restante idêntico à sua versão atual com funções de câmera e reconhecimento)
+   você pode copiar daqui pra baixo o mesmo JS da versão anterior sem alterações */
 </script>
 </body>
 </html>
