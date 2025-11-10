@@ -61,7 +61,6 @@
     </h1>
     <div class="muted">Front no GitHub Pages + API no Apps Script (Planilhas + Drive). Clique <b>Ativar câmera</b>.</div>
 
-    <!-- restante igual -->
     <div class="row">
       <div class="col">
         <h2>Cadastro</h2>
@@ -132,19 +131,28 @@
 
 <script>
 /* ====== RELÓGIO EM TEMPO REAL ====== */
-setInterval(()=>{
-  const d=new Date();
-  const h=String(d.getHours()).padStart(2,'0');
-  const m=String(d.getMinutes()).padStart(2,'0');
-  const s=String(d.getSeconds()).padStart(2,'0');
-  $('#clock').textContent=`${h}:${m}:${s}`;
-},1000);
+function atualizarRelogio() {
+  const clock = document.getElementById("clock");
+  const agora = new Date();
+  const dia = String(agora.getDate()).padStart(2, "0");
+  const mes = String(agora.getMonth() + 1).padStart(2, "0");
+  const ano = agora.getFullYear();
+  const hora = String(agora.getHours()).padStart(2, "0");
+  const min = String(agora.getMinutes()).padStart(2, "0");
+  const seg = String(agora.getSeconds()).padStart(2, "0");
+  clock.textContent = `${dia}/${mes}/${ano} — ${hora}:${min}:${seg}`;
+}
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
 
 /* ====== API URL ====== */
 const GAS_API_URL='https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
 
-/* (restante idêntico à sua versão atual com funções de câmera e reconhecimento)
-   você pode copiar daqui pra baixo o mesmo JS da versão anterior sem alterações */
+/* ====== FUNÇÕES FACE E RECONHECIMENTO ======
+   copie exatamente o JS da sua versão anterior daqui pra baixo
+   (mantém todas as funções: loadModels, startCamera, snapshot, saveCadastro, etc.)
+   nada precisa ser alterado no restante do script.
+*/
 </script>
 </body>
 </html>
