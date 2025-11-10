@@ -80,7 +80,7 @@
   </div>
 
 <script>
-const GAS_API_URL = 'https://script.google.com/macros/s/COLE_AQUI_URL_DO_SEU_DEPLOY/exec'; // ← TROQUE POR SUA URL
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec';
 const state = { embeddingsBase: [], running: false, lastMatch: '', stream: null };
 
 function log(msg){ const el = document.getElementById('log'); el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`; el.scrollTop = el.scrollHeight; }
@@ -123,8 +123,8 @@ async function startCamera(deviceId) {
     await new Promise(res => video.onloadedmetadata = () => { video.play(); res(); });
     document.getElementById('recStatus').textContent = 'Câmera ativa, iniciando reconhecimento…';
     log('Câmera iniciada.');
-    if (!state.running) recognitionLoop();
-    await listDevices();
+    if (!state.running) recognitionLoop(); // inicia o loop
+    await listDevices(); // labels aparecem após primeira permissão
   } catch (e) {
     document.getElementById('recStatus').innerHTML = `<span class="err">Falha ao iniciar câmera: ${e.name||''} ${e.message||e}</span>`;
     log('getUserMedia erro: ' + (e.name||'') + ' ' + (e.message||e));
@@ -239,7 +239,7 @@ document.getElementById('btnFoto').addEventListener('click', async ()=>{
     const resp = await saveCadastro({ nome, rg, cpf, cin, embedding, fotoBase64 });
     cadStatus.innerHTML = `<span class="ok">Cadastro salvo.</span>`;
     log('Cadastro salvo. FileId: ' + (resp.fileId||'') );
-    await fetchEmbeddings();
+    await fetchEmbeddings(); // atualiza base
   } catch(e) {
     cadStatus.innerHTML = `<span class="err">${e.message}</span>`;
     log('Cadastro erro: ' + e.message);
@@ -253,7 +253,7 @@ document.getElementById('btnFoto').addEventListener('click', async ()=>{
       document.getElementById('recStatus').innerHTML = '<span class="err">Navegador sem suporte a câmera.</span>';
       log('mediaDevices não suportado.');
     } else {
-      await listDevices();
+      await listDevices(); // pode listar vazio até a primeira permissão
     }
   } catch(e) {
     document.getElementById('recStatus').innerHTML = `<span class="err">Falha ao iniciar: ${e.message}</span>`;
