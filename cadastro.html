@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cadastro – Reconhecimento Facial</title>
+<style>
+:root{--bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;--border:#334155;--btn:#0284c7;--btn-muted:#475569;--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.6 system-ui,Segoe UI,Roboto}
+.wrap{max-width:980px;margin:24px auto;padding:0 16px}.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+h1{margin:0 0 6px}.subtitle{color:var(--muted);font-weight:600}
+.grid{display:grid;gap:14px}@media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
+label{display:block;margin-bottom:6px;font-weight:600}
+input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#132036;color:var(--ink)}
+button{background:var(--btn);border:none;font-weight:700;cursor:pointer}button[disabled]{background:var(--btn-muted)}
+.oculto{display:none}video,canvas{width:100%;max-height:320px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
+.nav{display:flex;gap:10px;margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
+</style></head><body>
+<div class="wrap"><div class="card">
+  <div class="nav"><a href="./reconhecimento.html">Ir para Reconhecimento</a></div>
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+    <div><h1>Cadastro</h1><div class="subtitle">Preencha os dados e capture 1 foto.</div></div>
+    <div class="subtitle" id="clock">--/--/---- — --:--:--</div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div><label for="nome">Nome completo</label><input id="nome" placeholder="Nome completo" autocomplete="name"/></div>
+    <div><label for="tipoDoc">Tipo de Documento</label>
+      <select id="tipoDoc">
+        <option value="">Selecione</option><option value="rg" selected>RG</option>
+        <option value="cpf">CPF</option><option value="cin">CIN</option>
+      </select>
+    </div>
+
+    <div id="campoRG"><label for="rg">RG</label><input id="rg" placeholder="12.345.678-9" inputmode="numeric"/></div>
+    <div id="campoCPF" class="oculto"><label for="cpf">CPF</label><input id="cpf" placeholder="123.456.789-09" inputmode="numeric"/></div>
+    <div id="campoCIN" class="oculto"><label for="cin">CIN</label><input id="cin" placeholder="Somente números" inputmode="numeric"/></div>
+  </div>
+
+  <h3 style="margin:18px 0 8px">Captura para cadastro</h3>
+  <video id="preview" playsinline autoplay muted class="oculto"></video>
+  <canvas id="snapshot" class="oculto"></canvas>
+  <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+    <div style="flex:1"><label for="videoDevice">Dispositivo de vídeo</label><select id="videoDevice"></select></div>
+    <div style="flex:1"><label for="sens">Sensibilidade (opcional)</label><input type="range" id="sens" min="1" max="100" value="50"/></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+    <button id="btnAtivar">Ativar câmera</button>
+    <button id="btnParar" disabled>Parar</button>
+    <button id="btnCapturar">Capturar + Salvar</button>
+  </div>
+</div></div>
+
+<script defer>
+const API_URL="https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec";
+const TZ="America/Sao_Paulo";
+function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});document.getElementById("clock").textContent=f.format(new Date()).replace(","," —")}setInterval(tick,1000);tick();
+
+const sel=document.getElementById("tipoDoc");const campos={rg:document.getElementById("campoRG"),cpf:document.getElementById("campoCPF"),cin:document.getElementById("campoCIN")};
+function showDoc(){Object.values(campos).forEach(c=>c.classList.add("oculto"));if(campos[sel.value])campos[sel.value].classList.remove("oculto")}
+sel.addEventListener("change",showDoc);showDoc();
+
+function mask(input,pat){if(!input)return;input.addEventListener("input",()=>{const n=input.value.replace(/\D/g,"");let j=0,out="";for(let i=0;i<pat.length;i++){out+=pat[i]==="9"?(n[j++]??""):pat[i];if(j>n.length)break}input.value=out.replace(/undefined/g,"")})}
+mask(document.getElementById("rg"),"99.999.999-9");mask(document.getElementById("cpf"),"999.999.999-99");mask(document.getElementById("cin"),"99999999999");
+const dig=s=> (s||"").replace(/\D/g,"");
+
+let stream=null;const v=document.getElementById("preview"), c=document.getElementById("snapshot"), selDev=document.getElementById("videoDevice");
+async function ensurePerm(){try{if(!stream){const s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});s.getTracks().forEach(t=>t.stop())}return true}catch(e){alert("Permita acesso à câmera.");return false}}
+async function listDevs(){const d=await navigator.mediaDevices.enumerateDevices();selDev.innerHTML="";d.filter(x=>x.kind==="videoinput").forEach((x,i)=>{const o=document.createElement("option");o.value=x.deviceId;o.textContent=x.label||`Câmera ${i+1}`;selDev.appendChild(o)})}
+async function startCam(id){if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia(id?{video:{deviceId:{exact:id}},audio:false}:{video:true,audio:false});v.srcObject=stream;v.classList.remove("oculto");c.classList.add("oculto");document.getElementById("btnParar").disabled=false}
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}v.classList.add("oculto");document.getElementById("btnParar").disabled=true}
+function snap(){if(!v.srcObject)return null;const w=v.videoWidth||640,h=v.videoHeight||480;c.width=w;c.height=h;c.getContext("2d").drawImage(v,0,0,w,h);c.classList.remove("oculto");return c.toDataURL("image/jpeg",0.92)}
+
+document.getElementById("btnAtivar").addEventListener("click",async()=>{if(await ensurePerm()){await listDevs();await startCam(selDev.value||undefined)}})
+document.getElementById("btnParar").addEventListener("click",stopCam)
+selDev.addEventListener("change",()=>startCam(selDev.value))
+
+async function enviar(){
+  const nome=document.getElementById("nome").value.trim();const tipo=sel.value;
+  const rg=dig(document.getElementById("rg").value),cpf=dig(document.getElementById("cpf").value),cin=dig(document.getElementById("cin").value);
+  if(!nome) return alert("Informe o nome."); if(!tipo) return alert("Selecione o tipo de documento.");
+  if(tipo==="rg"&&!rg) return alert("Informe o RG."); if(tipo==="cpf"&&!cpf) return alert("Informe o CPF."); if(tipo==="cin"&&!cin) return alert("Informe o CIN.");
+  const fotoBase64=snap();
+  try{const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},mode:"cors",
+    body:JSON.stringify({action:"salvarCadastro",nome,tipo,rg,cpf,cin,fotoBase64,tsClient:new Date().toISOString()})});
+    if(!r.ok) throw 0; alert("Cadastro salvo!");
+  }catch(_){alert("Falha ao salvar.")}
+}
+document.getElementById("btnCapturar").addEventListener("click",enviar);
+
+// preparar devices de cara (mostra nomes no Android/Chrome após 1ª permissão)
+document.addEventListener("DOMContentLoaded",async()=>{if(await ensurePerm())await listDevs()});
+</script>
+</body></html>
