@@ -4,19 +4,22 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Cadastro</title>
 <style>
-  *{box-sizing:border-box} body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
+  *{box-sizing:border-box}body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
   .card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
-  h1{margin:0 0 8px} .muted{color:#94a3b8}
+  h1{margin:0 0 8px}.muted{color:#94a3b8}
   label{display:block;margin:10px 0 6px;font-weight:600}
   input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
-  button{background:#0284c7;border:none;font-weight:700;cursor:pointer} button[disabled]{background:#475569}
-  .grid{display:grid;gap:12px} @media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
+  button{background:#0284c7;border:none;font-weight:700;cursor:pointer}
+  button[disabled]{background:#475569;cursor:not-allowed;opacity:.7}
+  .grid{display:grid;gap:12px}@media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
   .oculto{display:none}
   video,canvas{width:100%;max-height:360px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
-  .row{display:flex;gap:10px;align-items:center}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .msg{margin-top:8px;color:#fbbc04}
-  .nav{margin-bottom:12px} .nav a{color:#93c5fd;text-decoration:none}
+  .nav{margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
+  .token{display:flex;gap:8px;margin:6px 0 16px}.token input{flex:1}
+  fieldset[disabled]{opacity:.45;filter:grayscale(.2)}
 </style>
 </head>
 <body>
@@ -26,36 +29,49 @@
     <h1>Cadastro</h1><div id="clock" class="muted">--/--/---- — --:--:--</div>
   </div>
 
-  <div class="grid grid-2">
-    <div><label for="nome">Nome completo</label><input id="nome" placeholder="Nome completo"/></div>
-    <div><label for="tipoDoc">Tipo de Documento</label>
-      <select id="tipoDoc"><option value="">Selecione</option><option value="rg" selected>RG</option><option value="cpf">CPF</option><option value="cin">CIN</option></select>
+  <!-- TOKEN -->
+  <div>
+    <label>Token de acesso</label>
+    <div class="token">
+      <input id="tokenInput" type="password" placeholder="Informe o token para liberar o cadastro">
+      <button id="btnValidar">Validar</button>
     </div>
-    <div id="campoRG"><label for="rg">RG</label><input id="rg" placeholder="12.345.678-9" inputmode="numeric"/></div>
-    <div id="campoCPF" class="oculto"><label for="cpf">CPF</label><input id="cpf" placeholder="123.456.789-09" inputmode="numeric"/></div>
-    <div id="campoCIN" class="oculto"><label for="cin">CIN</label><input id="cin" placeholder="Somente números" inputmode="numeric"/></div>
+    <div id="tokenStatus" class="muted">Bloqueado.</div>
   </div>
 
-  <h3 style="margin:16px 0 8px">Captura</h3>
-  <video id="preview" playsinline autoplay muted class="oculto"></video>
-  <canvas id="snapshot" class="oculto"></canvas>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <label for="videoDevice">Dispositivo de vídeo</label>
-      <select id="videoDevice"></select>
+  <fieldset id="blocoCadastro" disabled>
+    <div class="grid grid-2">
+      <div><label for="nome">Nome completo</label><input id="nome" placeholder="Nome completo"/></div>
+      <div><label for="tipoDoc">Tipo de Documento</label>
+        <select id="tipoDoc"><option value="">Selecione</option><option value="rg" selected>RG</option><option value="cpf">CPF</option><option value="cin">CIN</option></select>
+      </div>
+      <div id="campoRG"><label for="rg">RG</label><input id="rg" placeholder="12.345.678-9" inputmode="numeric"/></div>
+      <div id="campoCPF" class="oculto"><label for="cpf">CPF</label><input id="cpf" placeholder="123.456.789-09" inputmode="numeric"/></div>
+      <div id="campoCIN" class="oculto"><label for="cin">CIN</label><input id="cin" placeholder="Somente números" inputmode="numeric"/></div>
     </div>
-    <div style="flex:1">
-      <label for="sens">Sensibilidade</label>
-      <input type="range" id="sens" min="1" max="100" value="50"/>
-    </div>
-  </div>
 
-  <div class="row" style="margin-top:10px">
-    <button id="btnAtivar">Ativar câmera</button>
-    <button id="btnParar" disabled>Parar</button>
-    <button id="btnSalvar">Capturar + Salvar</button>
-  </div>
+    <h3 style="margin:16px 0 8px">Captura</h3>
+    <video id="preview" playsinline autoplay muted class="oculto"></video>
+    <canvas id="snapshot" class="oculto"></canvas>
+
+    <div class="row" style="margin-top:10px">
+      <div style="flex:1">
+        <label for="videoDevice">Dispositivo de vídeo</label>
+        <select id="videoDevice"></select>
+      </div>
+      <div style="flex:1">
+        <label for="sens">Sensibilidade</label>
+        <input type="range" id="sens" min="1" max="100" value="50"/>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button id="btnAtivar">Ativar câmera</button>
+      <button id="btnParar" disabled>Parar</button>
+      <button id="btnSalvar">Capturar + Salvar</button>
+    </div>
+  </fieldset>
+
   <div id="msg" class="msg"></div>
 </div></div>
 
@@ -63,10 +79,29 @@
 /* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec";
 const TZ="America/Sao_Paulo";
+const TOKEN="123456"; // <<< troque aqui
+const SKEY="rf_token_ok";
 
 /* ===== Relógio ===== */
 function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});clock.textContent=f.format(new Date()).replace(","," —")}
 setInterval(tick,1000); tick();
+
+/* ===== Token gating ===== */
+const tokenInput=document.getElementById('tokenInput');
+const btnValidar=document.getElementById('btnValidar');
+const tokenStatus=document.getElementById('tokenStatus');
+const blocoCadastro=document.getElementById('blocoCadastro');
+
+function setGate(open){
+  blocoCadastro.disabled=!open;
+  tokenStatus.textContent=open?"Liberado.":"Bloqueado.";
+}
+function checkStored(){ if(sessionStorage.getItem(SKEY)==="1"){ setGate(true); } }
+btnValidar.addEventListener('click',()=>{
+  if(tokenInput.value.trim()===TOKEN){ sessionStorage.setItem(SKEY,"1"); setGate(true); }
+  else { setGate(false); alert("Token inválido."); }
+});
+checkStored();
 
 /* ===== Campos + máscaras ===== */
 const sel=document.getElementById("tipoDoc");
@@ -79,37 +114,36 @@ const nums=s=>(s||"").replace(/\D/g,"");
 
 /* ===== Câmera robusta ===== */
 let stream=null; const v=preview, c=snapshot, dev=videoDevice, msg=msg;
-async function pedirPerm(){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});t.getTracks().forEach(x=>x.stop());return true}catch(e){msg.textContent="Permita a câmera no cadeado/Permissões do site.";return false}}
+async function pedirPerm(){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});t.getTracks().forEach(x=>x.stop());return true}catch(e){msg.textContent="Permita a câmera no cadeado do navegador.";return false}}
 async function listar(){const ds=await navigator.mediaDevices.enumerateDevices();dev.innerHTML="";ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||`Câmera ${i+1}`;dev.appendChild(o)}); if(!dev.value && dev.options.length) dev.selectedIndex=0;}
-async function iniciar(){try{const id=dev.value||null;const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false}; if(stream) stream.getTracks().forEach(t=>t.stop()); stream=await navigator.mediaDevices.getUserMedia(cons); v.srcObject=stream; v.classList.remove("oculto"); c.classList.add("oculto"); btnParar.disabled=false; msg.textContent=""; }catch(e){msg.textContent="Não foi possível abrir a câmera. Verifique permissões ou troque o dispositivo.";}}
+async function iniciar(){try{const id=dev.value||null;const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false}; if(stream) stream.getTracks().forEach(t=>t.stop()); stream=await navigator.mediaDevices.getUserMedia(cons); v.srcObject=stream; v.classList.remove("oculto"); c.classList.add("oculto"); btnParar.disabled=false; msg.textContent=""; }catch(e){msg.textContent="Não foi possível abrir a câmera. Verifique permissões.";}}
 function parar(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null} v.classList.add("oculto"); btnParar.disabled=true;}
 function snap(){if(!v.srcObject) return null; const w=v.videoWidth||640,h=v.videoHeight||480; c.width=w; c.height=h; c.getContext("2d").drawImage(v,0,0,w,h); c.classList.remove("oculto"); return c.toDataURL("image/jpeg",0.92);}
 
 /* ===== Enviar ===== */
 async function salvar(){
-  const nome=nome.value.trim(), tipo=sel.value;
+  const nomeVal=nome.value.trim(), tipo=sel.value;
   const rgv=nums(rg.value), cpfv=nums(cpf.value), cinv=nums(cin.value);
-  if(!nome){msg.textContent="Informe o nome.";return}
-  if(!tipo){msg.textContent="Selecione o tipo de documento.";return}
-  if(tipo==="rg"&&!rgv){msg.textContent="Informe o RG.";return}
-  if(tipo==="cpf"&&!cpfv){msg.textContent="Informe o CPF.";return}
-  if(tipo==="cin"&&!cinv){msg.textContent="Informe o CIN.";return}
-  const fotoBase64=snap();
-  msg.textContent="Enviando...";
+  if(!nomeVal) return msg.textContent="Informe o nome.";
+  if(!tipo) return msg.textContent="Selecione o tipo de documento.";
+  if(tipo==="rg"&&!rgv) return msg.textContent="Informe o RG.";
+  if(tipo==="cpf"&&!cpfv) return msg.textContent="Informe o CPF.";
+  if(tipo==="cin"&&!cinv) return msg.textContent="Informe o CIN.";
+  const fotoBase64=snap(); msg.textContent="Enviando...";
   try{
     const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},mode:"cors",
-      body:JSON.stringify({action:"salvarCadastro",nome,tipo,rg:rgv,cpf:cpfv,cin:cinv,fotoBase64,tsClient:new Date().toISOString()})});
-    if(!r.ok) throw 0; msg.textContent="Cadastro salvo."; 
+      body:JSON.stringify({action:"salvarCadastro",nome:nomeVal,tipo,rg:rgv,cpf:cpfv,cin:cinv,fotoBase64,tsClient:new Date().toISOString()})});
+    if(!r.ok) throw 0; msg.textContent="Cadastro salvo.";
   }catch(_){msg.textContent="Falha ao enviar. Verifique a API."}
 }
 
 /* ===== Binds ===== */
-btnAtivar.addEventListener("click", async()=>{const ok=await pedirPerm(); if(ok){await listar(); await iniciar();}});
-dev.addEventListener("change", iniciar);
-btnParar.addEventListener("click", parar);
-btnSalvar.addEventListener("click", salvar);
+btnAtivar.addEventListener("click", async()=>{if(blocoCadastro.disabled) return alert("Informe o token."); const ok=await pedirPerm(); if(ok){await listar(); await iniciar();}});
+dev.addEventListener("change", ()=>{if(blocoCadastro.disabled) return; iniciar();});
+btnParar.addEventListener("click", ()=>{if(blocoCadastro.disabled) return alert("Informe o token."); parar();});
+btnSalvar.addEventListener("click", ()=>{if(blocoCadastro.disabled) return alert("Informe o token."); salvar();});
 
-/* prepara lista (pode mostrar nomes após 1ª permissão) */
+/* prepara lista (após 1ª permissão) */
 document.addEventListener("DOMContentLoaded", async()=>{if(await pedirPerm()) await listar();});
 </script>
 </body></html>
