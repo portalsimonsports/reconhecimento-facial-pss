@@ -4,28 +4,37 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Cadastro</title>
 <style>
-  *{box-sizing:border-box}body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
   .card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
   h1{margin:0 0 8px}.muted{color:#94a3b8}
   label{display:block;margin:10px 0 6px;font-weight:600}
   input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
-  button{background:#0284c7;border:none;font-weight:700;cursor:pointer}
+  button{background:#0284c7;border:none;font-weight:700;cursor:pointer;transition:background .2s}
+  button:hover{background:#0369a1}
   button[disabled]{background:#475569;cursor:not-allowed;opacity:.7}
-  .grid{display:grid;gap:12px}@media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
+  .grid{display:grid;gap:12px}
+  @media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
   .oculto{display:none}
   video,canvas{width:100%;max-height:360px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .msg{margin-top:8px;color:#fbbc04}
   .nav{margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
-  .token{display:flex;gap:8px;margin:6px 0 16px}.token input{flex:1}
+  .msg{margin-top:8px;color:#fbbc04}
   fieldset[disabled]{opacity:.45;filter:grayscale(.2)}
+
+  /* ===== Campo de token responsivo ===== */
+  .token{display:flex;justify-content:center;align-items:stretch;gap:6px;margin:8px 0 16px;flex-wrap:wrap}
+  .token input{flex:1;min-width:200px;max-width:400px;font-size:15px;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
+  .token button{flex:0 0 auto;min-width:140px;font-size:15px;border-radius:10px;background:#0284c7;color:#fff;font-weight:600;border:none;cursor:pointer;transition:background .2s}
+  .token button:hover{background:#0369a1}
+  @media(max-width:600px){.token{flex-direction:column;align-items:stretch}.token button{width:100%}}
 </style>
 </head>
 <body>
 <div class="wrap"><div class="card">
   <div class="nav"><a href="./index.html">← voltar</a></div>
-  <div style="display:flex;justify-content:space-between;gap:12px">
+  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
     <h1>Cadastro</h1><div id="clock" class="muted">--/--/---- — --:--:--</div>
   </div>
 
@@ -41,13 +50,34 @@
 
   <fieldset id="blocoCadastro" disabled>
     <div class="grid grid-2">
-      <div><label for="nome">Nome completo</label><input id="nome" placeholder="Nome completo"/></div>
-      <div><label for="tipoDoc">Tipo de Documento</label>
-        <select id="tipoDoc"><option value="">Selecione</option><option value="rg" selected>RG</option><option value="cpf">CPF</option><option value="cin">CIN</option></select>
+      <div>
+        <label for="nome">Nome completo</label>
+        <input id="nome" placeholder="Nome completo"/>
       </div>
-      <div id="campoRG"><label for="rg">RG</label><input id="rg" placeholder="12.345.678-9" inputmode="numeric"/></div>
-      <div id="campoCPF" class="oculto"><label for="cpf">CPF</label><input id="cpf" placeholder="123.456.789-09" inputmode="numeric"/></div>
-      <div id="campoCIN" class="oculto"><label for="cin">CIN</label><input id="cin" placeholder="Somente números" inputmode="numeric"/></div>
+      <div>
+        <label for="tipoDoc">Tipo de Documento</label>
+        <select id="tipoDoc">
+          <option value="">Selecione</option>
+          <option value="rg" selected>RG</option>
+          <option value="cpf">CPF</option>
+          <option value="cin">CIN</option>
+        </select>
+      </div>
+
+      <div id="campoRG">
+        <label for="rg">RG</label>
+        <input id="rg" placeholder="12.345.678-9" inputmode="numeric"/>
+      </div>
+
+      <div id="campoCPF" class="oculto">
+        <label for="cpf">CPF</label>
+        <input id="cpf" placeholder="123.456.789-09" inputmode="numeric"/>
+      </div>
+
+      <div id="campoCIN" class="oculto">
+        <label for="cin">CIN</label>
+        <input id="cin" placeholder="Somente números" inputmode="numeric"/>
+      </div>
     </div>
 
     <h3 style="margin:16px 0 8px">Captura</h3>
@@ -79,11 +109,14 @@
 /* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec";
 const TZ="America/Sao_Paulo";
-const TOKEN="123456"; // <<< troque aqui
-const SKEY="rf_token_ok";
+const TOKEN="123456";          // <<< troque aqui (use o mesmo do reconhecimento)
+const SKEY="rf_token_ok";      // chave de sessão
 
 /* ===== Relógio ===== */
-function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});clock.textContent=f.format(new Date()).replace(","," —")}
+function tick(){
+  const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  clock.textContent=f.format(new Date()).replace(","," —");
+}
 setInterval(tick,1000); tick();
 
 /* ===== Token gating ===== */
@@ -106,19 +139,82 @@ checkStored();
 /* ===== Campos + máscaras ===== */
 const sel=document.getElementById("tipoDoc");
 const campos={rg:campoRG,cpf:campoCPF,cin:campoCIN};
-function showDoc(){Object.values(campos).forEach(c=>c.classList.add("oculto")); if(campos[sel.value])campos[sel.value].classList.remove("oculto")}
+function showDoc(){
+  Object.values(campos).forEach(c=>c.classList.add("oculto"));
+  if(campos[sel.value])campos[sel.value].classList.remove("oculto");
+}
 sel.addEventListener("change",showDoc); showDoc();
-function mask(el,pat){if(!el)return;el.addEventListener("input",()=>{const n=el.value.replace(/\D/g,"");let j=0,out="";for(let i=0;i<pat.length;i++){out+=pat[i]==="9"?(n[j++]??""):pat[i];if(j>n.length)break}el.value=out.replace(/undefined/g,"")})}
-mask(rg,"99.999.999-9"); mask(cpf,"999.999.999-99"); mask(cin,"99999999999");
-const nums=s=>(s||"").replace(/\D/g,"");
+
+function mask(el,pat){
+  if(!el) return;
+  el.addEventListener("input",()=>{
+    const n=el.value.replace(/\D/g,"");
+    let j=0,out="";
+    for(let i=0;i<pat.length;i++){
+      out+= (pat[i]==="9") ? (n[j++]??"") : pat[i];
+      if(j>n.length) break;
+    }
+    el.value=out.replace(/undefined/g,"");
+  });
+}
+mask(rg,"99.999.999-9");
+mask(cpf,"999.999.999-99");
+mask(cin,"99999999999");
+const nums = s => (s||"").replace(/\D/g,"");
 
 /* ===== Câmera robusta ===== */
-let stream=null; const v=preview, c=snapshot, dev=videoDevice, msg=msg;
-async function pedirPerm(){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});t.getTracks().forEach(x=>x.stop());return true}catch(e){msg.textContent="Permita a câmera no cadeado do navegador.";return false}}
-async function listar(){const ds=await navigator.mediaDevices.enumerateDevices();dev.innerHTML="";ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||`Câmera ${i+1}`;dev.appendChild(o)}); if(!dev.value && dev.options.length) dev.selectedIndex=0;}
-async function iniciar(){try{const id=dev.value||null;const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false}; if(stream) stream.getTracks().forEach(t=>t.stop()); stream=await navigator.mediaDevices.getUserMedia(cons); v.srcObject=stream; v.classList.remove("oculto"); c.classList.add("oculto"); btnParar.disabled=false; msg.textContent=""; }catch(e){msg.textContent="Não foi possível abrir a câmera. Verifique permissões.";}}
-function parar(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null} v.classList.add("oculto"); btnParar.disabled=true;}
-function snap(){if(!v.srcObject) return null; const w=v.videoWidth||640,h=v.videoHeight||480; c.width=w; c.height=h; c.getContext("2d").drawImage(v,0,0,w,h); c.classList.remove("oculto"); return c.toDataURL("image/jpeg",0.92);}
+let stream=null;
+const v=preview, c=snapshot, dev=videoDevice, msg=msg;
+
+async function pedirPerm(){
+  try{
+    const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
+    t.getTracks().forEach(x=>x.stop());
+    return true;
+  }catch(e){
+    msg.textContent="Permita a câmera no cadeado do navegador.";
+    return false;
+  }
+}
+async function listar(){
+  const ds=await navigator.mediaDevices.enumerateDevices();
+  dev.innerHTML="";
+  ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{
+    const o=document.createElement("option");
+    o.value=d.deviceId;
+    o.textContent=d.label||`Câmera ${i+1}`;
+    dev.appendChild(o);
+  });
+  if(!dev.value && dev.options.length) dev.selectedIndex=0;
+}
+async function iniciar(){
+  try{
+    const id=dev.value||null;
+    const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false};
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream=await navigator.mediaDevices.getUserMedia(cons);
+    v.srcObject=stream;
+    v.classList.remove("oculto");
+    c.classList.add("oculto");
+    btnParar.disabled=false;
+    msg.textContent="";
+  }catch(e){
+    msg.textContent="Não foi possível abrir a câmera. Verifique permissões.";
+  }
+}
+function parar(){
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  v.classList.add("oculto");
+  btnParar.disabled=true;
+}
+function snap(){
+  if(!v.srcObject) return null;
+  const w=v.videoWidth||640,h=v.videoHeight||480;
+  c.width=w; c.height=h;
+  c.getContext("2d").drawImage(v,0,0,w,h);
+  c.classList.remove("oculto");
+  return c.toDataURL("image/jpeg",0.92);
+}
 
 /* ===== Enviar ===== */
 async function salvar(){
@@ -130,20 +226,48 @@ async function salvar(){
   if(tipo==="cpf"&&!cpfv) return msg.textContent="Informe o CPF.";
   if(tipo==="cin"&&!cinv) return msg.textContent="Informe o CIN.";
   const fotoBase64=snap(); msg.textContent="Enviando...";
+
   try{
-    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},mode:"cors",
-      body:JSON.stringify({action:"salvarCadastro",nome:nomeVal,tipo,rg:rgv,cpf:cpfv,cin:cinv,fotoBase64,tsClient:new Date().toISOString()})});
-    if(!r.ok) throw 0; msg.textContent="Cadastro salvo.";
-  }catch(_){msg.textContent="Falha ao enviar. Verifique a API."}
+    const r=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      mode:"cors",
+      body:JSON.stringify({
+        action:"salvarCadastro",
+        nome:nomeVal,tipo,rg:rgv,cpf:cpfv,cin:cinv,
+        fotoBase64,tsClient:new Date().toISOString()
+      })
+    });
+    if(!r.ok) throw 0;
+    msg.textContent="Cadastro salvo.";
+  }catch(_){
+    msg.textContent="Falha ao enviar. Verifique a API.";
+  }
 }
 
 /* ===== Binds ===== */
-btnAtivar.addEventListener("click", async()=>{if(blocoCadastro.disabled) return alert("Informe o token."); const ok=await pedirPerm(); if(ok){await listar(); await iniciar();}});
-dev.addEventListener("change", ()=>{if(blocoCadastro.disabled) return; iniciar();});
-btnParar.addEventListener("click", ()=>{if(blocoCadastro.disabled) return alert("Informe o token."); parar();});
-btnSalvar.addEventListener("click", ()=>{if(blocoCadastro.disabled) return alert("Informe o token."); salvar();});
+btnAtivar.addEventListener("click", async()=>{
+  if(blocoCadastro.disabled) return alert("Informe o token.");
+  const ok=await pedirPerm();
+  if(ok){await listar(); await iniciar();}
+});
+dev.addEventListener("change", ()=>{
+  if(blocoCadastro.disabled) return;
+  iniciar();
+});
+btnParar.addEventListener("click", ()=>{
+  if(blocoCadastro.disabled) return alert("Informe o token.");
+  parar();
+});
+btnSalvar.addEventListener("click", ()=>{
+  if(blocoCadastro.disabled) return alert("Informe o token.");
+  salvar();
+});
 
 /* prepara lista (após 1ª permissão) */
-document.addEventListener("DOMContentLoaded", async()=>{if(await pedirPerm()) await listar();});
+document.addEventListener("DOMContentLoaded", async()=>{
+  if(await pedirPerm()) await listar();
+});
 </script>
-</body></html>
+</body>
+</html>
