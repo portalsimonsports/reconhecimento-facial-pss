@@ -1,58 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Portal SimonSports — Reconhecimento Facial</title>
-  <style>
-    :root{
-      --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;
-      --btn:#0284c7;--btn-hover:#0369a1;--radius:12px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--ink);
-      font-family:system-ui,Segoe UI,Roboto,sans-serif;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-      text-align:center;
-    }
-    h1{font-size:26px;margin:0 0 8px}
-    .subtitle{color:var(--muted);margin-bottom:24px}
-    a{
-      display:inline-block;
-      background:var(--btn);
-      color:#fff;
-      text-decoration:none;
-      padding:14px 28px;
-      margin:6px;
-      border-radius:var(--radius);
-      font-weight:600;
-      transition:.2s;
-    }
-    a:hover{background:var(--btn-hover)}
-    #clock{color:var(--muted);margin-top:24px;font-size:14px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Portal SimonSports — Reconhecimento Facial</title>
+<style>
+  :root{
+    --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;
+    --btn:#0284c7;--btn-hover:#0369a1;--radius:14px;--shadow:0 8px 32px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,Segoe UI,Roboto,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    text-align:center;
+    padding:20px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:40px 28px;
+    max-width:420px;
+    width:100%;
+  }
+  img.logo{
+    width:120px;
+    height:auto;
+    margin-bottom:20px;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));
+  }
+  h1{font-size:24px;margin:0 0 6px}
+  .subtitle{color:var(--muted);margin-bottom:30px}
+  a{
+    display:block;
+    margin:10px 0;
+    padding:14px 24px;
+    background:var(--btn);
+    color:#fff;
+    border-radius:var(--radius);
+    text-decoration:none;
+    font-weight:600;
+    transition:.2s;
+  }
+  a:hover{background:var(--btn-hover)}
+  #clock{margin-top:28px;color:var(--muted);font-size:14px}
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(15px)}
+    to{opacity:1;transform:none}
+  }
+  .card{animation:fadeIn .8s ease-out forwards}
+</style>
 </head>
 <body>
-  <h1>Portal SimonSports</h1>
-  <div class="subtitle">Sistema de Reconhecimento Facial</div>
-  <a href="./cadastro.html">📋 Cadastro de Pessoas</a>
-  <a href="./reconhecimento.html">📸 Reconhecimento Facial</a>
-  <div id="clock">--/--/---- — --:--:--</div>
+  <div class="card">
+    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Camera_font_awesome.svg" alt="Logo" />
+    <h1>Reconhecimento Facial</h1>
+    <div class="subtitle">Portal SimonSports</div>
+
+    <a href="./cadastro.html">📋 Cadastro de Pessoas</a>
+    <a href="./reconhecimento.html">📸 Iniciar Reconhecimento Facial</a>
+
+    <div id="clock">--/--/---- — --:--:--</div>
+  </div>
 
   <script>
   const TZ="America/Sao_Paulo";
   function tick(){
-    const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    document.getElementById("clock").textContent=f.format(new Date()).replace(","," —");
+    try{
+      const fmt=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+      document.getElementById("clock").textContent=fmt.format(new Date()).replace(","," —");
+    }catch(_){
+      document.getElementById("clock").textContent=new Date().toLocaleString("pt-BR");
+    }
   }
-  setInterval(tick,1000);tick();
+  setInterval(tick,1000); tick();
   </script>
 </body>
 </html>
