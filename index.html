@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Portal SimonSports — Reconhecimento Facial</title>
+  <style>
+    :root{
+      --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;
+      --btn:#0284c7;--btn-hover:#0369a1;--radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:system-ui,Segoe UI,Roboto,sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      text-align:center;
+    }
+    h1{font-size:26px;margin:0 0 8px}
+    .subtitle{color:var(--muted);margin-bottom:24px}
+    a{
+      display:inline-block;
+      background:var(--btn);
+      color:#fff;
+      text-decoration:none;
+      padding:14px 28px;
+      margin:6px;
+      border-radius:var(--radius);
+      font-weight:600;
+      transition:.2s;
+    }
+    a:hover{background:var(--btn-hover)}
+    #clock{color:var(--muted);margin-top:24px;font-size:14px}
+  </style>
+</head>
+<body>
+  <h1>Portal SimonSports</h1>
+  <div class="subtitle">Sistema de Reconhecimento Facial</div>
+  <a href="./cadastro.html">📋 Cadastro de Pessoas</a>
+  <a href="./reconhecimento.html">📸 Reconhecimento Facial</a>
+  <div id="clock">--/--/---- — --:--:--</div>
+
+  <script>
+  const TZ="America/Sao_Paulo";
+  function tick(){
+    const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    document.getElementById("clock").textContent=f.format(new Date()).replace(","," —");
+  }
+  setInterval(tick,1000);tick();
+  </script>
+</body>
+</html>
