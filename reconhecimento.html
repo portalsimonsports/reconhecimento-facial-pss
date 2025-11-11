@@ -4,25 +4,109 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Reconhecimento</title>
 <style>
-  *{box-sizing:border-box}body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:#0b1220;
+    color:#e2e8f0;
+    font-family:system-ui,Segoe UI,Roboto;
+  }
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
-  .card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
-  h1{margin:0 0 8px}.muted{color:#94a3b8}
-  input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
-  button{background:#0284c7;border:none;font-weight:700;cursor:pointer}
-  button[disabled]{background:#475569;cursor:not-allowed;opacity:.7}
-  video,canvas{width:100%;max-height:420px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .nav{margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
+  .card{
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:20px;
+  }
+  h1{margin:0 0 8px}
+  .muted{color:#94a3b8}
+  input,select,button{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #334155;
+    background:#132036;
+    color:#e2e8f0;
+  }
+  button{
+    background:#0284c7;
+    border:none;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  button:hover{background:#0369a1}
+  button[disabled]{
+    background:#475569;
+    cursor:not-allowed;
+    opacity:.7;
+  }
+  video,canvas{
+    width:100%;
+    max-height:420px;
+    border-radius:12px;
+    background:#0b1220;
+    border:1px dashed #334155;
+  }
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .nav{margin-bottom:12px}
+  .nav a{
+    color:#93c5fd;
+    text-decoration:none;
+  }
   .msg{margin-top:10px;color:#fbbc04}
-  .token{display:flex;gap:8px;margin:6px 0 16px}.token input{flex:1}
+
+  /* ===== Campo de token responsivo ===== */
+  .token{
+    display:flex;
+    justify-content:center;
+    align-items:stretch;
+    gap:6px;
+    margin:8px 0 16px;
+    flex-wrap:wrap;
+  }
+  .token input{
+    flex:1;
+    min-width:200px;
+    max-width:400px;
+    font-size:15px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #334155;
+    background:#132036;
+    color:#e2e8f0;
+  }
+  .token button{
+    flex:0 0 auto;
+    min-width:140px;
+    font-size:15px;
+    border-radius:10px;
+    background:#0284c7;
+    color:#fff;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .token button:hover{background:#0369a1}
+
+  @media(max-width:600px){
+    .token{flex-direction:column;align-items:stretch}
+    .token button{width:100%}
+  }
 </style>
 </head>
 <body>
 <div class="wrap"><div class="card">
   <div class="nav"><a href="./index.html">← voltar</a></div>
-  <div style="display:flex;justify-content:space-between;gap:12px">
-    <h1>Reconhecimento</h1><div id="clock" class="muted">--/--/---- — --:--:--</div>
+  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <h1>Reconhecimento</h1>
+    <div id="clock" class="muted">--/--/---- — --:--:--</div>
   </div>
 
   <!-- TOKEN -->
@@ -39,9 +123,16 @@
   <canvas id="snapshot" class="oculto"></canvas>
 
   <div class="row" style="margin:12px 0">
-    <div style="flex:1"><label>Dispositivo</label><select id="videoDevice"></select></div>
-    <div style="flex:1"><button id="btnAtivar" disabled>Ativar câmera</button></div>
-    <div style="flex:1"><button id="btnParar" disabled>Parar</button></div>
+    <div style="flex:1">
+      <label>Dispositivo</label>
+      <select id="videoDevice"></select>
+    </div>
+    <div style="flex:1">
+      <button id="btnAtivar" disabled>Ativar câmera</button>
+    </div>
+    <div style="flex:1">
+      <button id="btnParar" disabled>Parar</button>
+    </div>
   </div>
 
   <button id="btnReconhecer" disabled>Reconhecer agora</button>
@@ -54,7 +145,10 @@ const TZ="America/Sao_Paulo";
 const TOKEN="123456"; // <<< troque aqui (mesmo do cadastro)
 const SKEY="rf_token_ok";
 
-function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});clock.textContent=f.format(new Date()).replace(","," —")}
+function tick(){
+  const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  clock.textContent=f.format(new Date()).replace(","," —");
+}
 setInterval(tick,1000); tick();
 
 /* ===== Token gating ===== */
@@ -69,43 +163,102 @@ function setGate(open){
   [btnAtivar,btnReconhecer].forEach(b=>b.disabled=!open);
   tokenStatus.textContent=open?"Liberado.":"Bloqueado.";
 }
-function checkStored(){ if(sessionStorage.getItem(SKEY)==="1"){ setGate(true); } }
+function checkStored(){if(sessionStorage.getItem(SKEY)==="1"){setGate(true);}}
 btnValidar.addEventListener('click',()=>{
-  if(tokenInput.value.trim()===TOKEN){ sessionStorage.setItem(SKEY,"1"); setGate(true); }
-  else { setGate(false); alert("Token inválido."); }
+  if(tokenInput.value.trim()===TOKEN){
+    sessionStorage.setItem(SKEY,"1");
+    setGate(true);
+  }else{
+    setGate(false);
+    alert("Token inválido.");
+  }
 });
 checkStored();
 
 /* ===== Câmera ===== */
-let stream=null; const v=preview, c=snapshot, dev=videoDevice, msg=msg;
-async function perm(){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});t.getTracks().forEach(x=>x.stop());return true}catch(e){msg.textContent="Permita a câmera no cadeado.";return false}}
-async function listar(){const ds=await navigator.mediaDevices.enumerateDevices();dev.innerHTML="";ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||`Câmera ${i+1}`;dev.appendChild(o)}); if(!dev.value&&dev.options.length)dev.selectedIndex=0;}
-async function iniciar(){try{const id=dev.value||null;const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false}; if(stream) stream.getTracks().forEach(t=>t.stop()); stream=await navigator.mediaDevices.getUserMedia(cons); v.srcObject=stream; v.classList.remove("oculto"); btnParar.disabled=false; msg.textContent=""; }catch(e){msg.textContent="Não foi possível abrir a câmera."}}
+let stream=null;
+const v=preview, c=snapshot, dev=videoDevice, msg=msg;
+
+async function perm(){
+  try{
+    const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
+    t.getTracks().forEach(x=>x.stop());
+    return true;
+  }catch(e){
+    msg.textContent="Permita a câmera no cadeado.";
+    return false;
+  }
+}
+async function listar(){
+  const ds=await navigator.mediaDevices.enumerateDevices();
+  dev.innerHTML="";
+  ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{
+    const o=document.createElement("option");
+    o.value=d.deviceId;
+    o.textContent=d.label||`Câmera ${i+1}`;
+    dev.appendChild(o);
+  });
+  if(!dev.value&&dev.options.length)dev.selectedIndex=0;
+}
+async function iniciar(){
+  try{
+    const id=dev.value||null;
+    const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false};
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream=await navigator.mediaDevices.getUserMedia(cons);
+    v.srcObject=stream;
+    v.classList.remove("oculto");
+    btnParar.disabled=false;
+    msg.textContent="";
+  }catch(e){
+    msg.textContent="Não foi possível abrir a câmera.";
+  }
+}
 async function parar(){
   if(!stream) return;
-  // exige token novamente para parar
-  const t = prompt("Informe o token para parar a câmera:");
-  if((t||"").trim()!==TOKEN){ alert("Token inválido. A câmera continuará ativa."); return; }
-  stream.getTracks().forEach(t=>t.stop()); stream=null; v.classList.add("oculto"); btnParar.disabled=true;
+  const t=prompt("Informe o token para parar a câmera:");
+  if((t||"").trim()!==TOKEN){
+    alert("Token inválido. A câmera continuará ativa.");
+    return;
+  }
+  stream.getTracks().forEach(t=>t.stop());
+  stream=null;
+  v.classList.add("oculto");
+  btnParar.disabled=true;
 }
-function snap(){if(!v.srcObject) return null; const w=v.videoWidth||640,h=v.videoHeight||480; c.width=w; c.height=h; c.getContext("2d").drawImage(v,0,0,w,h); return c.toDataURL("image/jpeg",0.92)}
+function snap(){
+  if(!v.srcObject) return null;
+  const w=v.videoWidth||640,h=v.videoHeight||480;
+  c.width=w;c.height=h;
+  c.getContext("2d").drawImage(v,0,0,w,h);
+  return c.toDataURL("image/jpeg",0.92);
+}
 
-btnAtivar.addEventListener("click", async()=>{if(btnAtivar.disabled) return alert("Informe o token."); if(await perm()){await listar(); await iniciar();}});
+btnAtivar.addEventListener("click", async()=>{
+  if(btnAtivar.disabled) return alert("Informe o token.");
+  if(await perm()){await listar(); await iniciar();}
+});
 dev.addEventListener("change", ()=>{if(!btnAtivar.disabled) iniciar();});
 btnParar.addEventListener("click", parar);
 
 btnReconhecer.addEventListener("click", async()=>{
   if(btnReconhecer.disabled) return alert("Informe o token.");
-  const fotoBase64=snap(); if(!fotoBase64){msg.textContent="Ative a câmera primeiro."; return}
+  const fotoBase64=snap();
+  if(!fotoBase64){msg.textContent="Ative a câmera primeiro.";return;}
   msg.textContent="Reconhecendo...";
   try{
-    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},mode:"cors",
-      body:JSON.stringify({action:"reconhecer",fotoBase64,tsClient:new Date().toISOString()})});
+    const r=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      mode:"cors",
+      body:JSON.stringify({action:"reconhecer",fotoBase64,tsClient:new Date().toISOString()})
+    });
     const data=await r.json().catch(()=>({}));
-    msg.textContent = r.ok ? (data?.nome ? `Reconhecido: ${data.nome} (${Math.round((data.score||0)*100)}%)` : "Sem correspondência.") : "Erro no servidor.";
+    msg.textContent=r.ok?(data?.nome?`Reconhecido: ${data.nome} (${Math.round((data.score||0)*100)}%)`:"Sem correspondência."):"Erro no servidor.";
   }catch(_){msg.textContent="Falha de rede."}
 });
 
 document.addEventListener("DOMContentLoaded", async()=>{if(await perm()) await listar();});
 </script>
-</body></html>
+</body>
+</html>
