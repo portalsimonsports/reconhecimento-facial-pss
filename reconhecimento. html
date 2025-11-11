@@ -1,70 +1,69 @@
-<!DOCTYPE html><html lang="pt-BR"><head>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Reconhecimento – Câmera</title>
+<title>Reconhecimento</title>
 <style>
-:root{--bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;--border:#334155;--btn:#0284c7;--btn-muted:#475569;--radius:14px}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.6 system-ui,Segoe UI,Roboto}
-.wrap{max-width:980px;margin:24px auto;padding:0 16px}.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-h1{margin:0 0 6px}.subtitle{color:var(--muted);font-weight:600}
-.nav{display:flex;gap:10px;margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
-video,canvas{width:100%;max-height:420px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
-input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#132036;color:var(--ink)}
-button{background:var(--btn);border:none;font-weight:700;cursor:pointer}button[disabled]{background:var(--btn-muted)}
-</style></head><body>
+  *{box-sizing:border-box} body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
+  .wrap{max-width:980px;margin:24px auto;padding:0 16px}
+  .card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
+  h1{margin:0 0 8px} .muted{color:#94a3b8}
+  input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
+  button{background:#0284c7;border:none;font-weight:700;cursor:pointer} button[disabled]{background:#475569}
+  video,canvas{width:100%;max-height:420px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
+  .row{display:flex;gap:10px;align-items:center}
+  .nav{margin-bottom:12px} .nav a{color:#93c5fd;text-decoration:none}
+  .msg{margin-top:10px;color:#fbbc04}
+</style>
+</head>
+<body>
 <div class="wrap"><div class="card">
-  <div class="nav"><a href="./cadastro.html">Ir para Cadastro</a></div>
-  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-    <div><h1>Reconhecimento Facial</h1><div class="subtitle">Somente câmera e data/hora.</div></div>
-    <div class="subtitle" id="clock">--/--/---- — --:--:--</div>
+  <div class="nav"><a href="./index.html">← voltar</a></div>
+  <div style="display:flex;justify-content:space-between;gap:12px">
+    <h1>Reconhecimento</h1><div id="clock" class="muted">--/--/---- — --:--:--</div>
   </div>
 
   <video id="preview" playsinline autoplay muted class="oculto"></video>
   <canvas id="snapshot" class="oculto"></canvas>
 
-  <div style="display:flex;gap:10px;align-items:center;margin:12px 0">
-    <div style="flex:1"><label for="videoDevice">Dispositivo de vídeo</label><select id="videoDevice"></select></div>
+  <div class="row" style="margin:12px 0">
+    <div style="flex:1"><label>Dispositivo</label><select id="videoDevice"></select></div>
     <div style="flex:1"><button id="btnAtivar">Ativar câmera</button></div>
     <div style="flex:1"><button id="btnParar" disabled>Parar</button></div>
   </div>
 
-  <div style="display:flex;gap:10px;flex-wrap:wrap">
-    <button id="btnReconhecer">Reconhecer agora</button>
-  </div>
-
-  <div id="resultado" class="subtitle" style="margin-top:12px"></div>
+  <button id="btnReconhecer">Reconhecer agora</button>
+  <div id="msg" class="msg"></div>
 </div></div>
 
-<script defer>
+<script>
 const API_URL="https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec";
 const TZ="America/Sao_Paulo";
-function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});document.getElementById("clock").textContent=f.format(new Date()).replace(","," —")}setInterval(tick,1000);tick();
+function tick(){const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});clock.textContent=f.format(new Date()).replace(","," —")}
+setInterval(tick,1000); tick();
 
-let stream=null;const v=document.getElementById("preview"), c=document.getElementById("snapshot"), selDev=document.getElementById("videoDevice");
-async function ensurePerm(){try{if(!stream){const s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});s.getTracks().forEach(t=>t.stop())}return true}catch(e){alert("Permita acesso à câmera.");return false}}
-async function listDevs(){const d=await navigator.mediaDevices.enumerateDevices();selDev.innerHTML="";d.filter(x=>x.kind==="videoinput").forEach((x,i)=>{const o=document.createElement("option");o.value=x.deviceId;o.textContent=x.label||`Câmera ${i+1}`;selDev.appendChild(o)})}
-async function startCam(id){if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia(id?{video:{deviceId:{exact:id}},audio:false}:{video:true,audio:false});v.srcObject=stream;v.classList.remove("oculto");c.classList.add("oculto");document.getElementById("btnParar").disabled=false}
-function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}v.classList.add("oculto");document.getElementById("btnParar").disabled=true}
-function snap(){if(!v.srcObject)return null;const w=v.videoWidth||640,h=v.videoHeight||480;c.width=w;c.height=h;c.getContext("2d").drawImage(v,0,0,w,h);return c.toDataURL("image/jpeg",0.92)}
+let stream=null; const v=preview, c=snapshot, dev=videoDevice, msg=msg;
+async function perm(){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});t.getTracks().forEach(x=>x.stop());return true}catch(e){msg.textContent="Permita a câmera no cadeado.";return false}}
+async function listar(){const ds=await navigator.mediaDevices.enumerateDevices();dev.innerHTML="";ds.filter(d=>d.kind==="videoinput").forEach((d,i)=>{const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||`Câmera ${i+1}`;dev.appendChild(o)}); if(!dev.value&&dev.options.length)dev.selectedIndex=0;}
+async function iniciar(){try{const id=dev.value||null;const cons=id?{video:{deviceId:{exact:id}},audio:false}:{video:{facingMode:"user"},audio:false}; if(stream) stream.getTracks().forEach(t=>t.stop()); stream=await navigator.mediaDevices.getUserMedia(cons); v.srcObject=stream; v.classList.remove("oculto"); btnParar.disabled=false; msg.textContent=""; }catch(e){msg.textContent="Não foi possível abrir a câmera."}}
+function parar(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null} v.classList.add("oculto"); btnParar.disabled=true;}
+function snap(){if(!v.srcObject) return null; const w=v.videoWidth||640,h=v.videoHeight||480; c.width=w; c.height=h; c.getContext("2d").drawImage(v,0,0,w,h); return c.toDataURL("image/jpeg",0.92)}
 
-document.getElementById("btnAtivar").addEventListener("click",async()=>{if(await ensurePerm()){await listDevs();await startCam(selDev.value||undefined)}})
-document.getElementById("btnParar").addEventListener("click",stopCam)
-selDev.addEventListener("change",()=>startCam(selDev.value))
+btnAtivar.addEventListener("click", async()=>{if(await perm()){await listar(); await iniciar();}});
+dev.addEventListener("change", iniciar);
+btnParar.addEventListener("click", parar);
 
-document.getElementById("btnReconhecer").addEventListener("click",async()=>{
-  const fotoBase64=snap(); if(!fotoBase64) return alert("Ative a câmera primeiro.");
-  const res=document.getElementById("resultado"); res.textContent="Reconhecendo...";
+btnReconhecer.addEventListener("click", async()=>{
+  const fotoBase64=snap(); if(!fotoBase64){msg.textContent="Ative a câmera primeiro."; return}
+  msg.textContent="Reconhecendo...";
   try{
     const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},mode:"cors",
       body:JSON.stringify({action:"reconhecer",fotoBase64,tsClient:new Date().toISOString()})});
     const data=await r.json().catch(()=>({}));
-    if(r.ok){
-      // esperado: {ok:true, nome:"Fulano", score:0.87} — adapte ao seu backend
-      res.textContent = data?.nome ? `Reconhecido: ${data.nome} (confiança ${Math.round((data.score||0)*100)}%)`
-                                   : "Sem correspondência.";
-    }else{res.textContent="Erro no reconhecimento."}
-  }catch(_){res.textContent="Falha de rede."}
+    msg.textContent = r.ok ? (data?.nome ? `Reconhecido: ${data.nome} (${Math.round((data.score||0)*100)}%)` : "Sem correspondência.") : "Erro no servidor.";
+  }catch(_){msg.textContent="Falha de rede."}
 });
 
-document.addEventListener("DOMContentLoaded",async()=>{if(await ensurePerm())await listDevs()});
+document.addEventListener("DOMContentLoaded", async()=>{if(await perm()) await listar();});
 </script>
 </body></html>
