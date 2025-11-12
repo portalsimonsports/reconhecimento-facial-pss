@@ -5,108 +5,32 @@
 <title>Reconhecimento</title>
 <style>
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    background:#0b1220;
-    color:#e2e8f0;
-    font-family:system-ui,Segoe UI,Roboto;
-  }
+  body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto}
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
-  .card{
-    background:#0f172a;
-    border:1px solid #334155;
-    border-radius:12px;
-    padding:20px;
-  }
-  h1{margin:0 0 8px}
-  .muted{color:#94a3b8}
-  input,select,button{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #334155;
-    background:#132036;
-    color:#e2e8f0;
-  }
-  button{
-    background:#0284c7;
-    border:none;
-    font-weight:700;
-    cursor:pointer;
-    transition:background .2s;
-  }
+  .card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
+  h1{margin:0 0 8px}.muted{color:#94a3b8}
+  input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
+  button{background:#0284c7;border:none;font-weight:700;cursor:pointer;transition:background .2s}
   button:hover{background:#0369a1}
-  button[disabled]{
-    background:#475569;
-    cursor:not-allowed;
-    opacity:.7;
-  }
-  video,canvas{
-    width:100%;
-    max-height:420px;
-    border-radius:12px;
-    background:#0b1220;
-    border:1px dashed #334155;
-  }
-  .row{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .nav{margin-bottom:12px}
-  .nav a{
-    color:#93c5fd;
-    text-decoration:none;
-  }
+  button[disabled]{background:#475569;cursor:not-allowed;opacity:.7}
+  video,canvas{width:100%;max-height:420px;border-radius:12px;background:#0b1220;border:1px dashed #334155}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .nav{margin-bottom:12px}.nav a{color:#93c5fd;text-decoration:none}
   .msg{margin-top:10px;color:#fbbc04}
 
-  /* ===== Campo de token responsivo ===== */
-  .token{
-    display:flex;
-    justify-content:center;
-    align-items:stretch;
-    gap:6px;
-    margin:8px 0 16px;
-    flex-wrap:wrap;
-  }
-  .token input{
-    flex:1;
-    min-width:200px;
-    max-width:400px;
-    font-size:15px;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #334155;
-    background:#132036;
-    color:#e2e8f0;
-  }
-  .token button{
-    flex:0 0 auto;
-    min-width:140px;
-    font-size:15px;
-    border-radius:10px;
-    background:#0284c7;
-    color:#fff;
-    font-weight:600;
-    border:none;
-    cursor:pointer;
-    transition:background .2s;
-  }
+  /* Campo de token responsivo */
+  .token{display:flex;justify-content:center;align-items:stretch;gap:6px;margin:8px 0 16px;flex-wrap:wrap}
+  .token input{flex:1;min-width:200px;max-width:400px;font-size:15px;padding:12px;border-radius:10px;border:1px solid #334155;background:#132036;color:#e2e8f0}
+  .token button{flex:0 0 auto;min-width:140px;font-size:15px;border-radius:10px;background:#0284c7;color:#fff;font-weight:600;border:none;cursor:pointer;transition:background .2s}
   .token button:hover{background:#0369a1}
-
-  @media(max-width:600px){
-    .token{flex-direction:column;align-items:stretch}
-    .token button{width:100%}
-  }
+  @media(max-width:600px){.token{flex-direction:column;align-items:stretch}.token button{width:100%}}
 </style>
 </head>
 <body>
 <div class="wrap"><div class="card">
   <div class="nav"><a href="./index.html">← voltar</a></div>
   <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-    <h1>Reconhecimento</h1>
-    <div id="clock" class="muted">--/--/---- — --:--:--</div>
+    <h1>Reconhecimento</h1><div id="clock" class="muted">--/--/---- — --:--:--</div>
   </div>
 
   <!-- TOKEN -->
@@ -123,16 +47,9 @@
   <canvas id="snapshot" class="oculto"></canvas>
 
   <div class="row" style="margin:12px 0">
-    <div style="flex:1">
-      <label>Dispositivo</label>
-      <select id="videoDevice"></select>
-    </div>
-    <div style="flex:1">
-      <button id="btnAtivar" disabled>Ativar câmera</button>
-    </div>
-    <div style="flex:1">
-      <button id="btnParar" disabled>Parar</button>
-    </div>
+    <div style="flex:1"><label>Dispositivo</label><select id="videoDevice"></select></div>
+    <div style="flex:1"><button id="btnAtivar" disabled>Ativar câmera</button></div>
+    <div style="flex:1"><button id="btnParar" disabled>Parar</button></div>
   </div>
 
   <button id="btnReconhecer" disabled>Reconhecer agora</button>
@@ -142,8 +59,9 @@
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbyiWtixyPNhraJnH1x7ACyxZkT0C0W-brX1_Udd02uDiROGldTN4rUechC2fTPgAvxdIw/exec";
 const TZ="America/Sao_Paulo";
-const TOKEN="123456"; // <<< troque aqui (mesmo do cadastro)
 const SKEY="rf_token_ok";
+let TOKEN_VALUE = "";
+let PERFIL = "";
 
 function tick(){
   const f=new Intl.DateTimeFormat("pt-BR",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
@@ -151,7 +69,16 @@ function tick(){
 }
 setInterval(tick,1000); tick();
 
-/* ===== Token gating ===== */
+/* ===== Token via GAS ===== */
+async function validarTokenNoServidor(token){
+  const r = await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    mode:"cors",
+    body:JSON.stringify({ action:"tokenValidate", token })
+  });
+  return await r.json();
+}
 const tokenInput=document.getElementById('tokenInput');
 const btnValidar=document.getElementById('btnValidar');
 const tokenStatus=document.getElementById('tokenStatus');
@@ -161,23 +88,33 @@ const btnReconhecer=document.getElementById('btnReconhecer');
 
 function setGate(open){
   [btnAtivar,btnReconhecer].forEach(b=>b.disabled=!open);
-  tokenStatus.textContent=open?"Liberado.":"Bloqueado.";
+  tokenStatus.textContent=open?`Liberado (${PERFIL}).`:"Bloqueado.";
 }
-function checkStored(){if(sessionStorage.getItem(SKEY)==="1"){setGate(true);}}
-btnValidar.addEventListener('click',()=>{
-  if(tokenInput.value.trim()===TOKEN){
-    sessionStorage.setItem(SKEY,"1");
-    setGate(true);
-  }else{
-    setGate(false);
-    alert("Token inválido.");
-  }
+btnValidar.addEventListener('click', async ()=>{
+  const t = tokenInput.value.trim();
+  if(!t){ alert("Informe o token."); return; }
+  try{
+    const res = await validarTokenNoServidor(t);
+    if(res.ok){
+      sessionStorage.setItem(SKEY,"1");
+      sessionStorage.setItem("rf_token_value", t);
+      TOKEN_VALUE = t; PERFIL = res.perfil||"";
+      setGate(true);
+    }else{
+      setGate(false);
+      alert(res.error||"Token inválido.");
+    }
+  }catch(_){ alert("Falha ao validar token."); }
 });
-checkStored();
+(function restoreGate(){
+  if(sessionStorage.getItem(SKEY)==="1"){
+    TOKEN_VALUE = sessionStorage.getItem("rf_token_value")||"";
+    if(TOKEN_VALUE) setGate(true);
+  }
+})();
 
 /* ===== Câmera ===== */
-let stream=null;
-const v=preview, c=snapshot, dev=videoDevice, msg=msg;
+let stream=null; const v=preview, c=snapshot, dev=videoDevice, msg=msg;
 
 async function perm(){
   try{
@@ -216,15 +153,20 @@ async function iniciar(){
 }
 async function parar(){
   if(!stream) return;
-  const t=prompt("Informe o token para parar a câmera:");
-  if((t||"").trim()!==TOKEN){
-    alert("Token inválido. A câmera continuará ativa.");
-    return;
-  }
-  stream.getTracks().forEach(t=>t.stop());
-  stream=null;
-  v.classList.add("oculto");
-  btnParar.disabled=true;
+  // pede token novamente p/ parar
+  const t = prompt("Informe o token para parar a câmera:");
+  if(!t) return;
+  try{
+    const res = await validarTokenNoServidor(t);
+    if(res.ok){
+      stream.getTracks().forEach(x=>x.stop());
+      stream=null;
+      v.classList.add("oculto");
+      btnParar.disabled=true;
+    }else{
+      alert(res.error||"Token inválido. A câmera continuará ativa.");
+    }
+  }catch(_){ alert("Falha ao validar token."); }
 }
 function snap(){
   if(!v.srcObject) return null;
@@ -243,19 +185,22 @@ btnParar.addEventListener("click", parar);
 
 btnReconhecer.addEventListener("click", async()=>{
   if(btnReconhecer.disabled) return alert("Informe o token.");
-  const fotoBase64=snap();
-  if(!fotoBase64){msg.textContent="Ative a câmera primeiro.";return;}
+  const fotoBase64=snap(); if(!fotoBase64){msg.textContent="Ative a câmera primeiro."; return}
   msg.textContent="Reconhecendo...";
   try{
     const r=await fetch(API_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       mode:"cors",
-      body:JSON.stringify({action:"reconhecer",fotoBase64,tsClient:new Date().toISOString()})
+      body:JSON.stringify({
+        action:"reconhecer",
+        token:TOKEN_VALUE, perfil:PERFIL,      // (opcional, só p/ log futuro)
+        fotoBase64, tsClient:new Date().toISOString()
+      })
     });
     const data=await r.json().catch(()=>({}));
-    msg.textContent=r.ok?(data?.nome?`Reconhecido: ${data.nome} (${Math.round((data.score||0)*100)}%)`:"Sem correspondência."):"Erro no servidor.";
-  }catch(_){msg.textContent="Falha de rede."}
+    msg.textContent = r.ok ? (data?.nome ? `Reconhecido: ${data.nome} (${Math.round((data.score||0)*100)}%)` : "Sem correspondência.") : "Erro no servidor.";
+  }catch(_){ msg.textContent="Falha de rede."; }
 });
 
 document.addEventListener("DOMContentLoaded", async()=>{if(await perm()) await listar();});
